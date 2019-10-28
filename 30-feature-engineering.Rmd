@@ -1,0 +1,81 @@
+---
+title: "30-feature-engineering"
+output: html_notebook
+---
+
+# Adding features
+
+## Standardized job satisfaction level relative to department
+
+Standardize measures relative to an employee's department. The standardized job satisfaction level may have impact on employee's leave. Why might this be informative? Imagine the job satisfaction level is 0.6, we have no idea whether it's good or not. If the average job satisfaction level is 0.5, then 0.6 is good. If the average job satisfaction level is 0.7, then 0.6 is bad. Standardizing by department rescales a number relative to an employee's department, where 0 indicates the employee's job satisfaction was average for the department, 1 indicates it is one standard deviation above, -1 indicates it is one standard deviation below.
+
+```{r, standardized_job_satisfaction_level_relative_department}
+standardized_job_satisfaction_level_relative_department <- function(df, var) {
+  if (!all(c("satisfaction_level", "department") %in% names(df))) {
+    stop("`data` must containing `satisfaction_level` and `department`")
+  }
+  df %>% 
+  group_by(department) %>% 
+  mutate(satisfaction_level_rel_department = scale({{var}})) %>%
+  ungroup()
+}
+```
+
+
+## Standardized score of last evaluation relative to department
+
+Standardize measures relative to an employee's department. The standardized score of last evaluation may have impact on employee's leave. Why might this be informative? Imagine the score of last evaluation is 0.6, we have no idea whether it's good or not. If the average score of last evaluation is 0.5, then 0.6 is good. If the average score of last evaluation is 0.7, then 0.6 is bad. Standardizing by department rescales a number relative to an employee's department, where 0 indicates the employee's score of last evaluation was average for the department, 1 indicates it is one standard deviation above, -1 indicates it is one standard deviation below.
+
+```{r, standardized_last_evaluation_relative_department}
+standardized_last_evaluation_relative_department <- function(df, var) {
+  if (!all(c("last_evaluation", "department") %in% names(df))) {
+    stop("`data` must containing `last_evaluation` and `department`")
+  }
+  df %>% 
+  group_by(department) %>% 
+  mutate(last_evaluation_rel_department = scale({{var}})) %>%
+  ungroup()
+}
+```
+
+## Standardized number of project participated relative to department
+
+Standardize measures relative to an employee's department. The standardized number of project participated may have impact on employee's leave. Why might this be informative? Imagine the number of project participated is 5, we have no idea whether it's good or not. If the average number of project participated is 3, then 5 is good. If the average number of project participated is 7, then 5 is bad. Standardizing by department rescales a number relative to an employee's department, where 0 indicates the employee's number of project participated was average for the department, 1 indicates it is one standard deviation above, -1 indicates it is one standard deviation below.
+
+```{r, standardized_number_project_relative_department}
+# Function for issue 1, with a similar structure of existing two functions above
+standardized_number_project_relative_department <- function(df) {
+  # number_project_rel_department
+}
+```
+
+
+## Standardized average monthly working hours relative to department
+
+Standardize measures relative to an employee's department. The standardized average monthly working hours may have impact on employee's leave. Why might this be informative? Imagine the average monthly working hours is 200, we have no idea whether it's good or not. If the mean of average monthly working hours is 150, then 200 is a long time. If mean of average monthly working hours is 250, then 200 is a short time. Standardizing by department rescales a number relative to an employee's department, where 0 indicates the average monthly working hours was average for the department, 1 indicates it is ones standard deviation above, -1 indicates it is one standard deviation below.
+
+```{r, standarized_average_monthly_hours_relative_department}
+# Function for issue 2, with a similar structure of existing two functions above
+standarized_average_monthly_hours_relative_department <- function(df, var) {
+  # average_monthly_hours_rel_department
+}
+```
+
+
+# Check new features
+
+Belowe I check whether there are any outliers over 3 standard deviation from the average. As a good standardized new feature, it should not contain any outlier over 3 standard deviation from the average. 
+
+```{r, check_outlier}
+hr_analytics %>% 
+  standardized_job_satisfaction_level_relative_department(satisfaction_level) %>% 
+  standardized_last_evaluation_relative_department(last_evaluation) %>% 
+  # standardized_number_project_relative_department(number_project) %>% 
+  # standarized_average_monthly_hours_relative_department(average_monthly_hours) %>% 
+  assert(within_bounds(-3,3), satisfaction_level_rel_department, last_evaluation_rel_department # number_project_rel_department, average_monthly_hours_rel_department
+  )
+```
+
+The test above shows that all the new standardized observations are with in 3 standard deviation from the average. 
+
+

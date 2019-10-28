@@ -1,0 +1,106 @@
+---
+title: "10-import"
+output: html_notebook
+---
+
+```{r, library_packages}
+library(tidyverse)
+library(assertr)
+library(janitor)
+```
+
+# Describe data
+
+This is a dataset about HR analytics, which focuses on the causes of employees leaving company. It looks into 9 aspects, including satisfaction level, last evaluation, number of projects worked on, average monthly hours, time spend in company, work accident yes or not, promotion in last 5 years, department, salary. The dimension of this dataset is 10 columns and 14999 rows.
+
+Here is the explanation for the variables:
+*satisfaction_level*: satisfaction level with the job (numeric, between 0 and 1)
+*last_evaluation*: score of last evaluatoin (numeric, between 0 and 1)
+*number_project*: number of project participated (numeric)
+*average_monthly_hours*: average monthly working hours (numeric)
+*time_spend_company*: year of work at the company (numeric)
+*work_accident*: had work accident or not (logic)
+*left*：left company or not (logic)
+*promotion_last_5years*: got promoted or not during last 5 years (logic)
+*department*: working department (character)
+*salary*: salary level (character, divided into "low", "medium", "high")
+
+
+# Read in and check data
+
+Import data and clean its names.
+```{r, import_data}
+hr_analytics <- read_csv("HR_comma_sep.csv") %>% 
+  clean_names()
+```
+
+Check the dimension and names for the data frame.
+```{r, check_dimension_and_names}
+dim(hr_analytics)
+names(hr_analytics)
+```
+
+
+Check all columns have NA or not.
+```{r, check_na}
+hr_analytics %>% 
+  assert(not_na, everything())
+```
+The test above shows there is no NA value in this dataset. 
+
+Check if the satisfaction level is between 0 and 1 (including).
+```{r, check_satisfaction_level}
+hr_analytics %>% 
+  verify(satisfaction_level > 0 & satisfaction_level <= 1)
+```
+The test above shows that the satisfaction level is within the bound of 0 to 1.
+
+Check if the last evaluation is between 0 and 1 (including).
+```{r, check_last_evaluation}
+hr_analytics %>% 
+  verify(last_evaluation > 0 & last_evaluation <= 1)
+```
+The test above shows that the last evaluation is within the bound of 0 to 1.
+
+Check if work_accident only includes 0 and 1. While 0 means having work accident, 1 means not having working accident.
+```{r, check_work_accident}
+hr_analytics %>% 
+  verify(work_accident == 0 | work_accident == 1)
+```
+The test above shows that Work_accident is either 0 or 1. 
+
+Check if left only includes 0 and 1. While 0 means not left, 1 means left.
+```{r, check_left}
+hr_analytics %>% 
+  verify(left == 0 | left == 1)
+```
+The test above shows that left is either 0 or 1. 
+
+Check if promotion_last_5years only includes 0 and 1. While 0 means having promotion during last 5 years, 1 means having no promotion during last 5 years.
+```{r, check_promotion_last_5years}
+hr_analytics %>% 
+  verify(promotion_last_5years == 0 | promotion_last_5years ==1)
+```
+The test above shows that promotion_last_5years is either 0 or 1.
+
+
+# Clean up data.
+
+The column name "sales" does not match the value in this column. Change it to "department".
+```{r, change_colname_sales}
+colnames(hr_analytics)[colnames(hr_analytics)=="sales"] <- "department"
+```
+
+The column name "average_montly_hours" miss a "h", which is not consistent with other column's name which using the full spelling. Change it to "average_monthly_hours".
+```{r, change_average_montly_hours}
+colnames(hr_analytics)[colnames(hr_analytics)=="average_montly_hours"] <- "average_monthly_hours"
+```
+
+Convert 3 columns (work_accident, left, and promotion_last_5years) to logical from numerical, since their value is either 0 or 1, which simply means true or false.
+```{r, change_numerical_to_logical}
+hr_analytics <- hr_analytics %>% 
+  mutate(work_accident = ifelse(work_accident == 1, TRUE, FALSE)) %>% 
+  mutate(left =  ifelse(left == 1, TRUE, FALSE)) %>% 
+  mutate(promotion_last_5years = ifelse(promotion_last_5years == 1, TRUE, FALSE))
+```
+
