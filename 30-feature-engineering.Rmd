@@ -90,7 +90,7 @@ The test above shows that overwork only includes True and False.
 
 ## Test new feature 3
 
-Property: Average number of project participated per year should be between 0 and 7 (minimum of number_project) inclusively. 
+Property: Average number of project participated per year should be between 0 and 7 (maximum of number_project) inclusively. 
 
 Function may be used for assert: within_bounds()
 
