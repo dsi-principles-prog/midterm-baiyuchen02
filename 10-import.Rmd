@@ -101,9 +101,9 @@ The column name "sales" does not match the value in this column. Change it to "d
 colnames(hr_analytics)[colnames(hr_analytics)=="sales"] <- "department"
 ```
 
-The column name "average_montly_hours" miss a "h", which is not consistent with other column's name which using the full spelling. Change it to "average_monthly_hours".
+The column name "average_montly_hours" miss a "h", which is not consistent with other column's name which using the full spelling. Also the "average" is confusing, we can delete it. Change it to "monthly_hours".
 ```{r, change_average_montly_hours}
-colnames(hr_analytics)[colnames(hr_analytics)=="average_montly_hours"] <- "average_monthly_hours"
+colnames(hr_analytics)[colnames(hr_analytics)=="average_montly_hours"] <- "monthly_hours"
 ```
 
 Convert 3 columns (work_accident, left, and promotion_last_5years) to logical from numerical, since their value is either 0 or 1, which simply means true or false.
@@ -113,4 +113,5 @@ hr_analytics <- hr_analytics %>%
   mutate(left =  ifelse(left == 1, TRUE, FALSE)) %>% 
   mutate(promotion_last_5years = ifelse(promotion_last_5years == 1, TRUE, FALSE))
 ```
+
 

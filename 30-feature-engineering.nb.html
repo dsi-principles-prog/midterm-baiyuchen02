@@ -1752,94 +1752,101 @@ summary {
 <!-- rnb-text-begin -->
 <div id="adding-features" class="section level1">
 <h1>Adding features</h1>
-<div id="standardized-job-satisfaction-level-relative-to-department" class="section level2">
-<h2>Standardized job satisfaction level relative to department</h2>
-<p>Standardize measures relative to an employee’s department. The standardized job satisfaction level may have impact on employee’s leave. Why might this be informative? Imagine the job satisfaction level is 0.6, we have no idea whether it’s good or not. If the average job satisfaction level is 0.5, then 0.6 is good. If the average job satisfaction level is 0.7, then 0.6 is bad. Standardizing by department rescales a number relative to an employee’s department, where 0 indicates the employee’s job satisfaction was average for the department, 1 indicates it is one standard deviation above, -1 indicates it is one standard deviation below.</p>
+<div id="new-feature-1-standardize-relative-to-department" class="section level2">
+<h2>New feature 1: Standardize relative to department</h2>
+<p>First, I add the standardized feature relative to department.</p>
+<p>The standardized job satisfaction level and score of last evaluation may have impact on employee’s leave. Why might standardize be informative? Imagine the job satisfaction level is 0.6, we have no idea whether it’s good or not. If the average job satisfaction level is 0.5, then 0.6 is good. If the average job satisfaction level is 0.7, then 0.6 is bad. Standardizing by department rescales a number relative to an employee’s department, where 0 indicates the employee’s job satisfaction was average for the department, 1 indicates it is one standard deviation above, -1 indicates it is one standard deviation below.</p>
+<p>Job satisfaction level and score of last evaluation may vary in different departments, so it’s necessary to divide them by department. Standardize measures relative to an employee’s department.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhbmRhcmRpemVkX2pvYl9zYXRpc2ZhY3Rpb25fbGV2ZWxfcmVsYXRpdmVfZGVwYXJ0bWVudCA8LSBmdW5jdGlvbihkZiwgdmFyKSB7XG4gIGlmICghYWxsKGMoXCJzYXRpc2ZhY3Rpb25fbGV2ZWxcIiwgXCJkZXBhcnRtZW50XCIpICVpbiUgbmFtZXMoZGYpKSkge1xuICAgIHN0b3AoXCJgZGF0YWAgbXVzdCBjb250YWluaW5nIGBzYXRpc2ZhY3Rpb25fbGV2ZWxgIGFuZCBgZGVwYXJ0bWVudGBcIilcbiAgfVxuICBkZiAlPiUgXG4gIGdyb3VwX2J5KGRlcGFydG1lbnQpICU+JSBcbiAgbXV0YXRlKHNhdGlzZmFjdGlvbl9sZXZlbF9yZWxfZGVwYXJ0bWVudCA9IHNjYWxlKHt7dmFyfX0pKSAlPiVcbiAgdW5ncm91cCgpXG59XG5gYGAifQ== -->
-<pre class="r"><code>standardized_job_satisfaction_level_relative_department &lt;- function(df, var) {
-  if (!all(c(&quot;satisfaction_level&quot;, &quot;department&quot;) %in% names(df))) {
-    stop(&quot;`data` must containing `satisfaction_level` and `department`&quot;)
-  }
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhbmRhcmRpemVfcmVsYXRpdmVfZGVwYXJ0bWVudCA8LSBmdW5jdGlvbihkZiwgdmFycykge1xuICBkZiAlPiUgXG4gICAgZ3JvdXBfYnkoZGVwYXJ0bWVudCkgJT4lIFxuICAgIG11dGF0ZV9hdCh2YXJzLCBsaXN0KHN0ZF9kZXAgPSBzY2FsZSkpICU+JSBcbiAgICB1bmdyb3VwKClcbn1cbmBgYCJ9 -->
+<pre class="r"><code>standardize_relative_department &lt;- function(df, vars) {
   df %&gt;% 
-  group_by(department) %&gt;% 
-  mutate(satisfaction_level_rel_department = scale({{var}})) %&gt;%
-  ungroup()
+    group_by(department) %&gt;% 
+    mutate_at(vars, list(std_dep = scale)) %&gt;% 
+    ungroup()
 }</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="standardized-score-of-last-evaluation-relative-to-department" class="section level2">
-<h2>Standardized score of last evaluation relative to department</h2>
-<p>Standardize measures relative to an employee’s department. The standardized score of last evaluation may have impact on employee’s leave. Why might this be informative? Imagine the score of last evaluation is 0.6, we have no idea whether it’s good or not. If the average score of last evaluation is 0.5, then 0.6 is good. If the average score of last evaluation is 0.7, then 0.6 is bad. Standardizing by department rescales a number relative to an employee’s department, where 0 indicates the employee’s score of last evaluation was average for the department, 1 indicates it is one standard deviation above, -1 indicates it is one standard deviation below.</p>
+<div id="new-feature-2-overwork" class="section level2">
+<h2>New feature 2: Overwork</h2>
+<p>8 working hours per workday and 5 workdays per week is the normal working scheme. The normal monthly working hours is 40 times 52 then divide 12, which is around 173. Therefore, the employee is overworked if his or her monthly working hours is over 173.</p>
+<p>I add the overwork feature to check whether the employee is overworked or not. I think overwork should have impact on employee’s leave.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhbmRhcmRpemVkX2xhc3RfZXZhbHVhdGlvbl9yZWxhdGl2ZV9kZXBhcnRtZW50IDwtIGZ1bmN0aW9uKGRmLCB2YXIpIHtcbiAgaWYgKCFhbGwoYyhcImxhc3RfZXZhbHVhdGlvblwiLCBcImRlcGFydG1lbnRcIikgJWluJSBuYW1lcyhkZikpKSB7XG4gICAgc3RvcChcImBkYXRhYCBtdXN0IGNvbnRhaW5pbmcgYGxhc3RfZXZhbHVhdGlvbmAgYW5kIGBkZXBhcnRtZW50YFwiKVxuICB9XG4gIGRmICU+JSBcbiAgZ3JvdXBfYnkoZGVwYXJ0bWVudCkgJT4lIFxuICBtdXRhdGUobGFzdF9ldmFsdWF0aW9uX3JlbF9kZXBhcnRtZW50ID0gc2NhbGUoe3t2YXJ9fSkpICU+JVxuICB1bmdyb3VwKClcbn1cbmBgYCJ9 -->
-<pre class="r"><code>standardized_last_evaluation_relative_department &lt;- function(df, var) {
-  if (!all(c(&quot;last_evaluation&quot;, &quot;department&quot;) %in% names(df))) {
-    stop(&quot;`data` must containing `last_evaluation` and `department`&quot;)
-  }
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2hlY2tfb3ZlcndvcmsgPC0gZnVuY3Rpb24oZGYsIHZhcikge1xuICBkZiAlPiUgXG4gICAgIG11dGF0ZShvdmVyd29yayA9IGNhc2Vfd2hlbih7e3Zhcn19IDw9IDE3MyB+IEZBTFNFLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAge3t2YXJ9fSA+IDE3MyB+IFRSVUUpKVxufVxuYGBgIn0= -->
+<pre class="r"><code>check_overwork &lt;- function(df, var) {
   df %&gt;% 
-  group_by(department) %&gt;% 
-  mutate(last_evaluation_rel_department = scale({{var}})) %&gt;%
-  ungroup()
+     mutate(overwork = case_when({{var}} &lt;= 173 ~ FALSE,
+                                 {{var}} &gt; 173 ~ TRUE))
 }</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="standardized-number-of-project-participated-relative-to-department" class="section level2">
-<h2>Standardized number of project participated relative to department</h2>
-<p>Standardize measures relative to an employee’s department. The standardized number of project participated may have impact on employee’s leave. Why might this be informative? Imagine the number of project participated is 5, we have no idea whether it’s good or not. If the average number of project participated is 3, then 5 is good. If the average number of project participated is 7, then 5 is bad. Standardizing by department rescales a number relative to an employee’s department, where 0 indicates the employee’s number of project participated was average for the department, 1 indicates it is one standard deviation above, -1 indicates it is one standard deviation below.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBGdW5jdGlvbiBmb3IgaXNzdWUgMSwgd2l0aCBhIHNpbWlsYXIgc3RydWN0dXJlIG9mIGV4aXN0aW5nIHR3byBmdW5jdGlvbnMgYWJvdmVcbnN0YW5kYXJkaXplZF9udW1iZXJfcHJvamVjdF9yZWxhdGl2ZV9kZXBhcnRtZW50IDwtIGZ1bmN0aW9uKGRmKSB7XG4gICMgbnVtYmVyX3Byb2plY3RfcmVsX2RlcGFydG1lbnRcbn1cbmBgYCJ9 -->
-<pre class="r"><code># Function for issue 1, with a similar structure of existing two functions above
-standardized_number_project_relative_department &lt;- function(df) {
-  # number_project_rel_department
-}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+<div id="new-feature-3-average-number-of-project-participated-per-year" class="section level2">
+<h2>New feature 3: Average number of project participated per year</h2>
+<p>I think average number of project participated per year is more meaningful than the total number of project participated for the predicative model.</p>
+<p>Therefore, I plan to add a new feature to show average number of project participated per year, it is equal to number of project participated divide year spend in the company (number_project / time_spend_company).</p>
+<p>Function name: average_number_project_per_year New feature: avg_num_proj_per_year Column used: number_project, time_spend_company</p>
 </div>
-<div id="standardized-average-monthly-working-hours-relative-to-department" class="section level2">
-<h2>Standardized average monthly working hours relative to department</h2>
-<p>Standardize measures relative to an employee’s department. The standardized average monthly working hours may have impact on employee’s leave. Why might this be informative? Imagine the average monthly working hours is 200, we have no idea whether it’s good or not. If the mean of average monthly working hours is 150, then 200 is a long time. If mean of average monthly working hours is 250, then 200 is a short time. Standardizing by department rescales a number relative to an employee’s department, where 0 indicates the average monthly working hours was average for the department, 1 indicates it is ones standard deviation above, -1 indicates it is one standard deviation below.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBGdW5jdGlvbiBmb3IgaXNzdWUgMiwgd2l0aCBhIHNpbWlsYXIgc3RydWN0dXJlIG9mIGV4aXN0aW5nIHR3byBmdW5jdGlvbnMgYWJvdmVcbnN0YW5kYXJpemVkX2F2ZXJhZ2VfbW9udGhseV9ob3Vyc19yZWxhdGl2ZV9kZXBhcnRtZW50IDwtIGZ1bmN0aW9uKGRmLCB2YXIpIHtcbiAgIyBhdmVyYWdlX21vbnRobHlfaG91cnNfcmVsX2RlcGFydG1lbnRcbn1cbmBgYCJ9 -->
-<pre class="r"><code># Function for issue 2, with a similar structure of existing two functions above
-standarized_average_monthly_hours_relative_department &lt;- function(df, var) {
-  # average_monthly_hours_rel_department
-}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+<div id="new-feature-4-difference-between-job-satisfaction-level-and-score-of-last-evaluation" class="section level2">
+<h2>New feature 4: Difference between job satisfaction level and score of last evaluation:</h2>
+<p>I think the difference between job satisfaction level and score of last evaluation is meaningful. Define the difference to be job satisfaction level minus score of last evaluation (satisfaction_level - last_evaluation). This diffenrence measures the cognitive difference between the employee’s own satisfaction on the company’s job and company’s job evaluation on the employee.</p>
+<p>Therefore, I plan to add a new feature to show the difference between job satisfaction level and score of last evaluation.</p>
+<p>Function name: get_difference New feature: diff_btw_satisfaction_evaluation Column used: satisfaction_level, last_evaluation</p>
 </div>
 </div>
-<div id="check-new-features" class="section level1">
-<h1>Check new features</h1>
-<p>Belowe I check whether there are any outliers over 3 standard deviation from the average. As a good standardized new feature, it should not contain any outlier over 3 standard deviation from the average.</p>
+<div id="test-new-features" class="section level1">
+<h1>Test new features</h1>
+<div id="test-new-feature-1" class="section level2">
+<h2>Test new feature 1</h2>
+<p>Belowe I test whether there are any outliers over 3 standard deviation from the average. As a good standardized new feature, it should not contain any outlier over 3 standard deviation from the average.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaHJfYW5hbHl0aWNzICU+JSBcbiAgc3RhbmRhcmRpemVkX2pvYl9zYXRpc2ZhY3Rpb25fbGV2ZWxfcmVsYXRpdmVfZGVwYXJ0bWVudChzYXRpc2ZhY3Rpb25fbGV2ZWwpICU+JSBcbiAgc3RhbmRhcmRpemVkX2xhc3RfZXZhbHVhdGlvbl9yZWxhdGl2ZV9kZXBhcnRtZW50KGxhc3RfZXZhbHVhdGlvbikgJT4lIFxuICAjIHN0YW5kYXJkaXplZF9udW1iZXJfcHJvamVjdF9yZWxhdGl2ZV9kZXBhcnRtZW50KG51bWJlcl9wcm9qZWN0KSAlPiUgXG4gICMgc3RhbmRhcml6ZWRfYXZlcmFnZV9tb250aGx5X2hvdXJzX3JlbGF0aXZlX2RlcGFydG1lbnQoYXZlcmFnZV9tb250aGx5X2hvdXJzKSAlPiUgXG4gIGFzc2VydCh3aXRoaW5fYm91bmRzKC0zLDMpLCBzYXRpc2ZhY3Rpb25fbGV2ZWxfcmVsX2RlcGFydG1lbnQsIGxhc3RfZXZhbHVhdGlvbl9yZWxfZGVwYXJ0bWVudCAjIG51bWJlcl9wcm9qZWN0X3JlbF9kZXBhcnRtZW50LCBhdmVyYWdlX21vbnRobHlfaG91cnNfcmVsX2RlcGFydG1lbnRcbiAgKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaHJfYW5hbHl0aWNzICU+JSBcbiAgc3RhbmRhcmRpemVfcmVsYXRpdmVfZGVwYXJ0bWVudChjKFwic2F0aXNmYWN0aW9uX2xldmVsXCIsIFwibGFzdF9ldmFsdWF0aW9uXCIpKSAlPiUgXG4gIHNlbGVjdChjb250YWlucyhcInN0ZF9kZXBcIikpICU+JSBcbiAgYXNzZXJ0KHdpdGhpbl9ib3VuZHMoLTMsMyksIGMoXCJzYXRpc2ZhY3Rpb25fbGV2ZWxfc3RkX2RlcFwiLCBcImxhc3RfZXZhbHVhdGlvbl9zdGRfZGVwXCIpKVxuYGBgIn0= -->
 <pre class="r"><code>hr_analytics %&gt;% 
-  standardized_job_satisfaction_level_relative_department(satisfaction_level) %&gt;% 
-  standardized_last_evaluation_relative_department(last_evaluation) %&gt;% 
-  # standardized_number_project_relative_department(number_project) %&gt;% 
-  # standarized_average_monthly_hours_relative_department(average_monthly_hours) %&gt;% 
-  assert(within_bounds(-3,3), satisfaction_level_rel_department, last_evaluation_rel_department # number_project_rel_department, average_monthly_hours_rel_department
-  )</code></pre>
+  standardize_relative_department(c(&quot;satisfaction_level&quot;, &quot;last_evaluation&quot;)) %&gt;% 
+  select(contains(&quot;std_dep&quot;)) %&gt;% 
+  assert(within_bounds(-3,3), c(&quot;satisfaction_level_std_dep&quot;, &quot;last_evaluation_std_dep&quot;))</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>The test above shows that all the new standardized observations are with in 3 standard deviation from the average.</p>
+<p>The test above shows that both the new standardized job statisfaction level relative to department and standardized score of last evaluation relative to department are with in 3 standard deviation from the average.</p>
+</div>
+<div id="test-new-feature-2" class="section level2">
+<h2>Test new feature 2</h2>
+<p>Below I test whether the overwork only includes True and False.</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhbmRhcmRpemVfcmVsYXRpdmVfZGVwYXJ0bWVudCA8LSBmdW5jdGlvbihkZiwgdmFycykge1xuICBkZiAlPiUgXG4gICAgZ3JvdXBfYnkoZGVwYXJ0bWVudCkgJT4lIFxuICAgIG11dGF0ZV9hdCh2YXJzLCBsaXN0KHN0ZF9kZXAgPSBzY2FsZSkpICU+JSBcbiAgICB1bmdyb3VwKClcbn1cbmBgYCJ9 -->
+<pre class="r"><code>standardize_relative_department &lt;- function(df, vars) {
+  df %&gt;% 
+    group_by(department) %&gt;% 
+    mutate_at(vars, list(std_dep = scale)) %&gt;% 
+    ungroup()
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The test above shows that overwork only includes True and False.</p>
+</div>
+<div id="test-new-feature-3" class="section level2">
+<h2>Test new feature 3</h2>
+<p>Property: Average number of project participated per year should be between 0 and 7 (minimum of number_project) inclusively.</p>
+<p>Function may be used for assert: within_bounds()</p>
+</div>
+<div id="test-new-feature-4" class="section level2">
+<h2>Test new feature 4</h2>
+<p>Property: Difference between job satisfaction level and score of last evluation should between -1 and 1 (inclusively).</p>
+<p>Function may be used for assert: within_bounds()</p>
+<!-- rnb-text-end -->
+</div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiMzAtZmVhdHVyZS1lbmdpbmVlcmluZyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyBBZGRpbmcgZmVhdHVyZXMKCiMjIFN0YW5kYXJkaXplZCBqb2Igc2F0aXNmYWN0aW9uIGxldmVsIHJlbGF0aXZlIHRvIGRlcGFydG1lbnQKClN0YW5kYXJkaXplIG1lYXN1cmVzIHJlbGF0aXZlIHRvIGFuIGVtcGxveWVlJ3MgZGVwYXJ0bWVudC4gVGhlIHN0YW5kYXJkaXplZCBqb2Igc2F0aXNmYWN0aW9uIGxldmVsIG1heSBoYXZlIGltcGFjdCBvbiBlbXBsb3llZSdzIGxlYXZlLiBXaHkgbWlnaHQgdGhpcyBiZSBpbmZvcm1hdGl2ZT8gSW1hZ2luZSB0aGUgam9iIHNhdGlzZmFjdGlvbiBsZXZlbCBpcyAwLjYsIHdlIGhhdmUgbm8gaWRlYSB3aGV0aGVyIGl0J3MgZ29vZCBvciBub3QuIElmIHRoZSBhdmVyYWdlIGpvYiBzYXRpc2ZhY3Rpb24gbGV2ZWwgaXMgMC41LCB0aGVuIDAuNiBpcyBnb29kLiBJZiB0aGUgYXZlcmFnZSBqb2Igc2F0aXNmYWN0aW9uIGxldmVsIGlzIDAuNywgdGhlbiAwLjYgaXMgYmFkLiBTdGFuZGFyZGl6aW5nIGJ5IGRlcGFydG1lbnQgcmVzY2FsZXMgYSBudW1iZXIgcmVsYXRpdmUgdG8gYW4gZW1wbG95ZWUncyBkZXBhcnRtZW50LCB3aGVyZSAwIGluZGljYXRlcyB0aGUgZW1wbG95ZWUncyBqb2Igc2F0aXNmYWN0aW9uIHdhcyBhdmVyYWdlIGZvciB0aGUgZGVwYXJ0bWVudCwgMSBpbmRpY2F0ZXMgaXQgaXMgb25lIHN0YW5kYXJkIGRldmlhdGlvbiBhYm92ZSwgLTEgaW5kaWNhdGVzIGl0IGlzIG9uZSBzdGFuZGFyZCBkZXZpYXRpb24gYmVsb3cuCgpgYGB7ciwgc3RhbmRhcmRpemVkX2pvYl9zYXRpc2ZhY3Rpb25fbGV2ZWxfcmVsYXRpdmVfZGVwYXJ0bWVudH0Kc3RhbmRhcmRpemVkX2pvYl9zYXRpc2ZhY3Rpb25fbGV2ZWxfcmVsYXRpdmVfZGVwYXJ0bWVudCA8LSBmdW5jdGlvbihkZiwgdmFyKSB7CiAgaWYgKCFhbGwoYygic2F0aXNmYWN0aW9uX2xldmVsIiwgImRlcGFydG1lbnQiKSAlaW4lIG5hbWVzKGRmKSkpIHsKICAgIHN0b3AoImBkYXRhYCBtdXN0IGNvbnRhaW5pbmcgYHNhdGlzZmFjdGlvbl9sZXZlbGAgYW5kIGBkZXBhcnRtZW50YCIpCiAgfQogIGRmICU+JSAKICBncm91cF9ieShkZXBhcnRtZW50KSAlPiUgCiAgbXV0YXRlKHNhdGlzZmFjdGlvbl9sZXZlbF9yZWxfZGVwYXJ0bWVudCA9IHNjYWxlKHt7dmFyfX0pKSAlPiUKICB1bmdyb3VwKCkKfQpgYGAKCgojIyBTdGFuZGFyZGl6ZWQgc2NvcmUgb2YgbGFzdCBldmFsdWF0aW9uIHJlbGF0aXZlIHRvIGRlcGFydG1lbnQKClN0YW5kYXJkaXplIG1lYXN1cmVzIHJlbGF0aXZlIHRvIGFuIGVtcGxveWVlJ3MgZGVwYXJ0bWVudC4gVGhlIHN0YW5kYXJkaXplZCBzY29yZSBvZiBsYXN0IGV2YWx1YXRpb24gbWF5IGhhdmUgaW1wYWN0IG9uIGVtcGxveWVlJ3MgbGVhdmUuIFdoeSBtaWdodCB0aGlzIGJlIGluZm9ybWF0aXZlPyBJbWFnaW5lIHRoZSBzY29yZSBvZiBsYXN0IGV2YWx1YXRpb24gaXMgMC42LCB3ZSBoYXZlIG5vIGlkZWEgd2hldGhlciBpdCdzIGdvb2Qgb3Igbm90LiBJZiB0aGUgYXZlcmFnZSBzY29yZSBvZiBsYXN0IGV2YWx1YXRpb24gaXMgMC41LCB0aGVuIDAuNiBpcyBnb29kLiBJZiB0aGUgYXZlcmFnZSBzY29yZSBvZiBsYXN0IGV2YWx1YXRpb24gaXMgMC43LCB0aGVuIDAuNiBpcyBiYWQuIFN0YW5kYXJkaXppbmcgYnkgZGVwYXJ0bWVudCByZXNjYWxlcyBhIG51bWJlciByZWxhdGl2ZSB0byBhbiBlbXBsb3llZSdzIGRlcGFydG1lbnQsIHdoZXJlIDAgaW5kaWNhdGVzIHRoZSBlbXBsb3llZSdzIHNjb3JlIG9mIGxhc3QgZXZhbHVhdGlvbiB3YXMgYXZlcmFnZSBmb3IgdGhlIGRlcGFydG1lbnQsIDEgaW5kaWNhdGVzIGl0IGlzIG9uZSBzdGFuZGFyZCBkZXZpYXRpb24gYWJvdmUsIC0xIGluZGljYXRlcyBpdCBpcyBvbmUgc3RhbmRhcmQgZGV2aWF0aW9uIGJlbG93LgoKYGBge3IsIHN0YW5kYXJkaXplZF9sYXN0X2V2YWx1YXRpb25fcmVsYXRpdmVfZGVwYXJ0bWVudH0Kc3RhbmRhcmRpemVkX2xhc3RfZXZhbHVhdGlvbl9yZWxhdGl2ZV9kZXBhcnRtZW50IDwtIGZ1bmN0aW9uKGRmLCB2YXIpIHsKICBpZiAoIWFsbChjKCJsYXN0X2V2YWx1YXRpb24iLCAiZGVwYXJ0bWVudCIpICVpbiUgbmFtZXMoZGYpKSkgewogICAgc3RvcCgiYGRhdGFgIG11c3QgY29udGFpbmluZyBgbGFzdF9ldmFsdWF0aW9uYCBhbmQgYGRlcGFydG1lbnRgIikKICB9CiAgZGYgJT4lIAogIGdyb3VwX2J5KGRlcGFydG1lbnQpICU+JSAKICBtdXRhdGUobGFzdF9ldmFsdWF0aW9uX3JlbF9kZXBhcnRtZW50ID0gc2NhbGUoe3t2YXJ9fSkpICU+JQogIHVuZ3JvdXAoKQp9CmBgYAoKIyMgU3RhbmRhcmRpemVkIG51bWJlciBvZiBwcm9qZWN0IHBhcnRpY2lwYXRlZCByZWxhdGl2ZSB0byBkZXBhcnRtZW50CgpTdGFuZGFyZGl6ZSBtZWFzdXJlcyByZWxhdGl2ZSB0byBhbiBlbXBsb3llZSdzIGRlcGFydG1lbnQuIFRoZSBzdGFuZGFyZGl6ZWQgbnVtYmVyIG9mIHByb2plY3QgcGFydGljaXBhdGVkIG1heSBoYXZlIGltcGFjdCBvbiBlbXBsb3llZSdzIGxlYXZlLiBXaHkgbWlnaHQgdGhpcyBiZSBpbmZvcm1hdGl2ZT8gSW1hZ2luZSB0aGUgbnVtYmVyIG9mIHByb2plY3QgcGFydGljaXBhdGVkIGlzIDUsIHdlIGhhdmUgbm8gaWRlYSB3aGV0aGVyIGl0J3MgZ29vZCBvciBub3QuIElmIHRoZSBhdmVyYWdlIG51bWJlciBvZiBwcm9qZWN0IHBhcnRpY2lwYXRlZCBpcyAzLCB0aGVuIDUgaXMgZ29vZC4gSWYgdGhlIGF2ZXJhZ2UgbnVtYmVyIG9mIHByb2plY3QgcGFydGljaXBhdGVkIGlzIDcsIHRoZW4gNSBpcyBiYWQuIFN0YW5kYXJkaXppbmcgYnkgZGVwYXJ0bWVudCByZXNjYWxlcyBhIG51bWJlciByZWxhdGl2ZSB0byBhbiBlbXBsb3llZSdzIGRlcGFydG1lbnQsIHdoZXJlIDAgaW5kaWNhdGVzIHRoZSBlbXBsb3llZSdzIG51bWJlciBvZiBwcm9qZWN0IHBhcnRpY2lwYXRlZCB3YXMgYXZlcmFnZSBmb3IgdGhlIGRlcGFydG1lbnQsIDEgaW5kaWNhdGVzIGl0IGlzIG9uZSBzdGFuZGFyZCBkZXZpYXRpb24gYWJvdmUsIC0xIGluZGljYXRlcyBpdCBpcyBvbmUgc3RhbmRhcmQgZGV2aWF0aW9uIGJlbG93LgoKYGBge3IsIHN0YW5kYXJkaXplZF9udW1iZXJfcHJvamVjdF9yZWxhdGl2ZV9kZXBhcnRtZW50fQojIEZ1bmN0aW9uIGZvciBpc3N1ZSAxLCB3aXRoIGEgc2ltaWxhciBzdHJ1Y3R1cmUgb2YgZXhpc3RpbmcgdHdvIGZ1bmN0aW9ucyBhYm92ZQpzdGFuZGFyZGl6ZWRfbnVtYmVyX3Byb2plY3RfcmVsYXRpdmVfZGVwYXJ0bWVudCA8LSBmdW5jdGlvbihkZikgewogICMgbnVtYmVyX3Byb2plY3RfcmVsX2RlcGFydG1lbnQKfQpgYGAKCgojIyBTdGFuZGFyZGl6ZWQgYXZlcmFnZSBtb250aGx5IHdvcmtpbmcgaG91cnMgcmVsYXRpdmUgdG8gZGVwYXJ0bWVudAoKU3RhbmRhcmRpemUgbWVhc3VyZXMgcmVsYXRpdmUgdG8gYW4gZW1wbG95ZWUncyBkZXBhcnRtZW50LiBUaGUgc3RhbmRhcmRpemVkIGF2ZXJhZ2UgbW9udGhseSB3b3JraW5nIGhvdXJzIG1heSBoYXZlIGltcGFjdCBvbiBlbXBsb3llZSdzIGxlYXZlLiBXaHkgbWlnaHQgdGhpcyBiZSBpbmZvcm1hdGl2ZT8gSW1hZ2luZSB0aGUgYXZlcmFnZSBtb250aGx5IHdvcmtpbmcgaG91cnMgaXMgMjAwLCB3ZSBoYXZlIG5vIGlkZWEgd2hldGhlciBpdCdzIGdvb2Qgb3Igbm90LiBJZiB0aGUgbWVhbiBvZiBhdmVyYWdlIG1vbnRobHkgd29ya2luZyBob3VycyBpcyAxNTAsIHRoZW4gMjAwIGlzIGEgbG9uZyB0aW1lLiBJZiBtZWFuIG9mIGF2ZXJhZ2UgbW9udGhseSB3b3JraW5nIGhvdXJzIGlzIDI1MCwgdGhlbiAyMDAgaXMgYSBzaG9ydCB0aW1lLiBTdGFuZGFyZGl6aW5nIGJ5IGRlcGFydG1lbnQgcmVzY2FsZXMgYSBudW1iZXIgcmVsYXRpdmUgdG8gYW4gZW1wbG95ZWUncyBkZXBhcnRtZW50LCB3aGVyZSAwIGluZGljYXRlcyB0aGUgYXZlcmFnZSBtb250aGx5IHdvcmtpbmcgaG91cnMgd2FzIGF2ZXJhZ2UgZm9yIHRoZSBkZXBhcnRtZW50LCAxIGluZGljYXRlcyBpdCBpcyBvbmVzIHN0YW5kYXJkIGRldmlhdGlvbiBhYm92ZSwgLTEgaW5kaWNhdGVzIGl0IGlzIG9uZSBzdGFuZGFyZCBkZXZpYXRpb24gYmVsb3cuCgpgYGB7ciwgc3RhbmRhcml6ZWRfYXZlcmFnZV9tb250aGx5X2hvdXJzX3JlbGF0aXZlX2RlcGFydG1lbnR9CiMgRnVuY3Rpb24gZm9yIGlzc3VlIDIsIHdpdGggYSBzaW1pbGFyIHN0cnVjdHVyZSBvZiBleGlzdGluZyB0d28gZnVuY3Rpb25zIGFib3ZlCnN0YW5kYXJpemVkX2F2ZXJhZ2VfbW9udGhseV9ob3Vyc19yZWxhdGl2ZV9kZXBhcnRtZW50IDwtIGZ1bmN0aW9uKGRmLCB2YXIpIHsKICAjIGF2ZXJhZ2VfbW9udGhseV9ob3Vyc19yZWxfZGVwYXJ0bWVudAp9CmBgYAoKCiMgQ2hlY2sgbmV3IGZlYXR1cmVzCgpCZWxvd2UgSSBjaGVjayB3aGV0aGVyIHRoZXJlIGFyZSBhbnkgb3V0bGllcnMgb3ZlciAzIHN0YW5kYXJkIGRldmlhdGlvbiBmcm9tIHRoZSBhdmVyYWdlLiBBcyBhIGdvb2Qgc3RhbmRhcmRpemVkIG5ldyBmZWF0dXJlLCBpdCBzaG91bGQgbm90IGNvbnRhaW4gYW55IG91dGxpZXIgb3ZlciAzIHN0YW5kYXJkIGRldmlhdGlvbiBmcm9tIHRoZSBhdmVyYWdlLiAKCmBgYHtyLCBjaGVja19vdXRsaWVyfQpocl9hbmFseXRpY3MgJT4lIAogIHN0YW5kYXJkaXplZF9qb2Jfc2F0aXNmYWN0aW9uX2xldmVsX3JlbGF0aXZlX2RlcGFydG1lbnQoc2F0aXNmYWN0aW9uX2xldmVsKSAlPiUgCiAgc3RhbmRhcmRpemVkX2xhc3RfZXZhbHVhdGlvbl9yZWxhdGl2ZV9kZXBhcnRtZW50KGxhc3RfZXZhbHVhdGlvbikgJT4lIAogICMgc3RhbmRhcmRpemVkX251bWJlcl9wcm9qZWN0X3JlbGF0aXZlX2RlcGFydG1lbnQobnVtYmVyX3Byb2plY3QpICU+JSAKICAjIHN0YW5kYXJpemVkX2F2ZXJhZ2VfbW9udGhseV9ob3Vyc19yZWxhdGl2ZV9kZXBhcnRtZW50KGF2ZXJhZ2VfbW9udGhseV9ob3VycykgJT4lIAogIGFzc2VydCh3aXRoaW5fYm91bmRzKC0zLDMpLCBzYXRpc2ZhY3Rpb25fbGV2ZWxfcmVsX2RlcGFydG1lbnQsIGxhc3RfZXZhbHVhdGlvbl9yZWxfZGVwYXJ0bWVudCAjIG51bWJlcl9wcm9qZWN0X3JlbF9kZXBhcnRtZW50LCBhdmVyYWdlX21vbnRobHlfaG91cnNfcmVsX2RlcGFydG1lbnQKICApCmBgYAoKVGhlIHRlc3QgYWJvdmUgc2hvd3MgdGhhdCBhbGwgdGhlIG5ldyBzdGFuZGFyZGl6ZWQgb2JzZXJ2YXRpb25zIGFyZSB3aXRoIGluIDMgc3RhbmRhcmQgZGV2aWF0aW9uIGZyb20gdGhlIGF2ZXJhZ2UuIAoKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiMzAtZmVhdHVyZS1lbmdpbmVlcmluZyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyBBZGRpbmcgZmVhdHVyZXMKCiMjIE5ldyBmZWF0dXJlIDE6IFN0YW5kYXJkaXplIHJlbGF0aXZlIHRvIGRlcGFydG1lbnQKCkZpcnN0LCBJIGFkZCB0aGUgc3RhbmRhcmRpemVkIGZlYXR1cmUgcmVsYXRpdmUgdG8gZGVwYXJ0bWVudC4gCgpUaGUgc3RhbmRhcmRpemVkIGpvYiBzYXRpc2ZhY3Rpb24gbGV2ZWwgYW5kIHNjb3JlIG9mIGxhc3QgZXZhbHVhdGlvbiBtYXkgaGF2ZSBpbXBhY3Qgb24gZW1wbG95ZWUncyBsZWF2ZS4gV2h5IG1pZ2h0IHN0YW5kYXJkaXplIGJlIGluZm9ybWF0aXZlPyBJbWFnaW5lIHRoZSBqb2Igc2F0aXNmYWN0aW9uIGxldmVsIGlzIDAuNiwgd2UgaGF2ZSBubyBpZGVhIHdoZXRoZXIgaXQncyBnb29kIG9yIG5vdC4gSWYgdGhlIGF2ZXJhZ2Ugam9iIHNhdGlzZmFjdGlvbiBsZXZlbCBpcyAwLjUsIHRoZW4gMC42IGlzIGdvb2QuIElmIHRoZSBhdmVyYWdlIGpvYiBzYXRpc2ZhY3Rpb24gbGV2ZWwgaXMgMC43LCB0aGVuIDAuNiBpcyBiYWQuIFN0YW5kYXJkaXppbmcgYnkgZGVwYXJ0bWVudCByZXNjYWxlcyBhIG51bWJlciByZWxhdGl2ZSB0byBhbiBlbXBsb3llZSdzIGRlcGFydG1lbnQsIHdoZXJlIDAgaW5kaWNhdGVzIHRoZSBlbXBsb3llZSdzIGpvYiBzYXRpc2ZhY3Rpb24gd2FzIGF2ZXJhZ2UgZm9yIHRoZSBkZXBhcnRtZW50LCAxIGluZGljYXRlcyBpdCBpcyBvbmUgc3RhbmRhcmQgZGV2aWF0aW9uIGFib3ZlLCAtMSBpbmRpY2F0ZXMgaXQgaXMgb25lIHN0YW5kYXJkIGRldmlhdGlvbiBiZWxvdy4KCkpvYiBzYXRpc2ZhY3Rpb24gbGV2ZWwgYW5kIHNjb3JlIG9mIGxhc3QgZXZhbHVhdGlvbiBtYXkgdmFyeSBpbiBkaWZmZXJlbnQgZGVwYXJ0bWVudHMsIHNvIGl0J3MgbmVjZXNzYXJ5IHRvIGRpdmlkZSB0aGVtIGJ5IGRlcGFydG1lbnQuIFN0YW5kYXJkaXplIG1lYXN1cmVzIHJlbGF0aXZlIHRvIGFuIGVtcGxveWVlJ3MgZGVwYXJ0bWVudC4KCmBgYHtyLCBzdGFuZGFyZGl6ZV9yZWxhdGl2ZV9kZXBhcnRtZW50fQpzdGFuZGFyZGl6ZV9yZWxhdGl2ZV9kZXBhcnRtZW50IDwtIGZ1bmN0aW9uKGRmLCB2YXJzKSB7CiAgZGYgJT4lIAogICAgZ3JvdXBfYnkoZGVwYXJ0bWVudCkgJT4lIAogICAgbXV0YXRlX2F0KHZhcnMsIGxpc3Qoc3RkX2RlcCA9IHNjYWxlKSkgJT4lIAogICAgdW5ncm91cCgpCn0KYGBgCgoKIyMgTmV3IGZlYXR1cmUgMjogT3ZlcndvcmsKCjggd29ya2luZyBob3VycyBwZXIgd29ya2RheSBhbmQgNSB3b3JrZGF5cyBwZXIgd2VlayBpcyB0aGUgbm9ybWFsIHdvcmtpbmcgc2NoZW1lLiBUaGUgbm9ybWFsIG1vbnRobHkgd29ya2luZyBob3VycyBpcyA0MCB0aW1lcyA1MiB0aGVuIGRpdmlkZSAxMiwgd2hpY2ggaXMgYXJvdW5kIDE3My4gVGhlcmVmb3JlLCB0aGUgZW1wbG95ZWUgaXMgb3ZlcndvcmtlZCBpZiBoaXMgb3IgaGVyIG1vbnRobHkgd29ya2luZyBob3VycyBpcyBvdmVyIDE3My4gCgpJIGFkZCB0aGUgb3ZlcndvcmsgZmVhdHVyZSB0byBjaGVjayB3aGV0aGVyIHRoZSBlbXBsb3llZSBpcyBvdmVyd29ya2VkIG9yIG5vdC4gSSB0aGluayBvdmVyd29yayBzaG91bGQgaGF2ZSBpbXBhY3Qgb24gZW1wbG95ZWUncyBsZWF2ZS4KCmBgYHtyLCBjaGVja19vdmVyd29ya30KY2hlY2tfb3ZlcndvcmsgPC0gZnVuY3Rpb24oZGYsIHZhcikgewogIGRmICU+JSAKICAgICBtdXRhdGUob3ZlcndvcmsgPSBjYXNlX3doZW4oe3t2YXJ9fSA8PSAxNzMgfiBGQUxTRSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAge3t2YXJ9fSA+IDE3MyB+IFRSVUUpKQp9CmBgYAoKCiMjIE5ldyBmZWF0dXJlIDM6IEF2ZXJhZ2UgbnVtYmVyIG9mIHByb2plY3QgcGFydGljaXBhdGVkIHBlciB5ZWFyCgpJIHRoaW5rIGF2ZXJhZ2UgbnVtYmVyIG9mIHByb2plY3QgcGFydGljaXBhdGVkIHBlciB5ZWFyIGlzIG1vcmUgbWVhbmluZ2Z1bCB0aGFuIHRoZSB0b3RhbCBudW1iZXIgb2YgcHJvamVjdCBwYXJ0aWNpcGF0ZWQgZm9yIHRoZSBwcmVkaWNhdGl2ZSBtb2RlbC4KClRoZXJlZm9yZSwgSSBwbGFuIHRvIGFkZCBhIG5ldyBmZWF0dXJlIHRvIHNob3cgYXZlcmFnZSBudW1iZXIgb2YgcHJvamVjdCBwYXJ0aWNpcGF0ZWQgcGVyIHllYXIsIGl0IGlzIGVxdWFsIHRvIG51bWJlciBvZiBwcm9qZWN0IHBhcnRpY2lwYXRlZCBkaXZpZGUgeWVhciBzcGVuZCBpbiB0aGUgY29tcGFueSAobnVtYmVyX3Byb2plY3QgLyB0aW1lX3NwZW5kX2NvbXBhbnkpLiAKCkZ1bmN0aW9uIG5hbWU6IGF2ZXJhZ2VfbnVtYmVyX3Byb2plY3RfcGVyX3llYXIKTmV3IGZlYXR1cmU6IGF2Z19udW1fcHJval9wZXJfeWVhcgpDb2x1bW4gdXNlZDogbnVtYmVyX3Byb2plY3QsIHRpbWVfc3BlbmRfY29tcGFueQoKCiMjIE5ldyBmZWF0dXJlIDQ6IERpZmZlcmVuY2UgYmV0d2VlbiBqb2Igc2F0aXNmYWN0aW9uIGxldmVsIGFuZCBzY29yZSBvZiBsYXN0IGV2YWx1YXRpb246CgpJIHRoaW5rIHRoZSBkaWZmZXJlbmNlIGJldHdlZW4gam9iIHNhdGlzZmFjdGlvbiBsZXZlbCBhbmQgc2NvcmUgb2YgbGFzdCBldmFsdWF0aW9uIGlzIG1lYW5pbmdmdWwuIERlZmluZSB0aGUgZGlmZmVyZW5jZSB0byBiZSBqb2Igc2F0aXNmYWN0aW9uIGxldmVsIG1pbnVzIHNjb3JlIG9mIGxhc3QgZXZhbHVhdGlvbiAoc2F0aXNmYWN0aW9uX2xldmVsIC0gbGFzdF9ldmFsdWF0aW9uKS4gVGhpcyBkaWZmZW5yZW5jZSBtZWFzdXJlcyB0aGUgY29nbml0aXZlIGRpZmZlcmVuY2UgYmV0d2VlbiB0aGUgZW1wbG95ZWUncyBvd24gc2F0aXNmYWN0aW9uIG9uIHRoZSBjb21wYW55J3Mgam9iIGFuZCBjb21wYW55J3Mgam9iIGV2YWx1YXRpb24gb24gdGhlIGVtcGxveWVlLgoKVGhlcmVmb3JlLCBJIHBsYW4gdG8gYWRkIGEgbmV3IGZlYXR1cmUgdG8gc2hvdyB0aGUgZGlmZmVyZW5jZSBiZXR3ZWVuIGpvYiBzYXRpc2ZhY3Rpb24gbGV2ZWwgYW5kIHNjb3JlIG9mIGxhc3QgZXZhbHVhdGlvbi4gCgpGdW5jdGlvbiBuYW1lOiBnZXRfZGlmZmVyZW5jZQpOZXcgZmVhdHVyZTogZGlmZl9idHdfc2F0aXNmYWN0aW9uX2V2YWx1YXRpb24KQ29sdW1uIHVzZWQ6IHNhdGlzZmFjdGlvbl9sZXZlbCwgbGFzdF9ldmFsdWF0aW9uCgoKCiMgVGVzdCBuZXcgZmVhdHVyZXMKCiMjIFRlc3QgbmV3IGZlYXR1cmUgMQoKQmVsb3dlIEkgdGVzdCB3aGV0aGVyIHRoZXJlIGFyZSBhbnkgb3V0bGllcnMgb3ZlciAzIHN0YW5kYXJkIGRldmlhdGlvbiBmcm9tIHRoZSBhdmVyYWdlLiBBcyBhIGdvb2Qgc3RhbmRhcmRpemVkIG5ldyBmZWF0dXJlLCBpdCBzaG91bGQgbm90IGNvbnRhaW4gYW55IG91dGxpZXIgb3ZlciAzIHN0YW5kYXJkIGRldmlhdGlvbiBmcm9tIHRoZSBhdmVyYWdlLiAKCmBgYHtyLCBjaGVja19vdXRsaWVyfQpocl9hbmFseXRpY3MgJT4lIAogIHN0YW5kYXJkaXplX3JlbGF0aXZlX2RlcGFydG1lbnQoYygic2F0aXNmYWN0aW9uX2xldmVsIiwgImxhc3RfZXZhbHVhdGlvbiIpKSAlPiUgCiAgc2VsZWN0KGNvbnRhaW5zKCJzdGRfZGVwIikpICU+JSAKICBhc3NlcnQod2l0aGluX2JvdW5kcygtMywzKSwgYygic2F0aXNmYWN0aW9uX2xldmVsX3N0ZF9kZXAiLCAibGFzdF9ldmFsdWF0aW9uX3N0ZF9kZXAiKSkKYGBgCgpUaGUgdGVzdCBhYm92ZSBzaG93cyB0aGF0IGJvdGggdGhlIG5ldyBzdGFuZGFyZGl6ZWQgam9iIHN0YXRpc2ZhY3Rpb24gbGV2ZWwgcmVsYXRpdmUgdG8gZGVwYXJ0bWVudCBhbmQgc3RhbmRhcmRpemVkIHNjb3JlIG9mIGxhc3QgZXZhbHVhdGlvbiByZWxhdGl2ZSB0byBkZXBhcnRtZW50IGFyZSB3aXRoIGluIDMgc3RhbmRhcmQgZGV2aWF0aW9uIGZyb20gdGhlIGF2ZXJhZ2UuIAoKIyMgVGVzdCBuZXcgZmVhdHVyZSAyCgpCZWxvdyBJIHRlc3Qgd2hldGhlciB0aGUgb3Zlcndvcmsgb25seSBpbmNsdWRlcyBUcnVlIGFuZCBGYWxzZS4KCmBgYHtyfQpocl9hbmFseXRpY3MgJT4lIAogIGNoZWNrX292ZXJ3b3JrKG1vbnRobHlfaG91cnMpICU+JSAKICBhc3NlcnQoaW5fc2V0KGMoVFJVRSwgRkFMU0UpKSwgb3ZlcndvcmspCmBgYAoKVGhlIHRlc3QgYWJvdmUgc2hvd3MgdGhhdCBvdmVyd29yayBvbmx5IGluY2x1ZGVzIFRydWUgYW5kIEZhbHNlLgoKIyMgVGVzdCBuZXcgZmVhdHVyZSAzCgpQcm9wZXJ0eTogQXZlcmFnZSBudW1iZXIgb2YgcHJvamVjdCBwYXJ0aWNpcGF0ZWQgcGVyIHllYXIgc2hvdWxkIGJlIGJldHdlZW4gMCBhbmQgNyAobWluaW11bSBvZiBudW1iZXJfcHJvamVjdCkgaW5jbHVzaXZlbHkuIAoKRnVuY3Rpb24gbWF5IGJlIHVzZWQgZm9yIGFzc2VydDogd2l0aGluX2JvdW5kcygpCgoKIyMgVGVzdCBuZXcgZmVhdHVyZSA0CgpQcm9wZXJ0eTogRGlmZmVyZW5jZSBiZXR3ZWVuIGpvYiBzYXRpc2ZhY3Rpb24gbGV2ZWwgYW5kIHNjb3JlIG9mIGxhc3QgZXZsdWF0aW9uIHNob3VsZCBiZXR3ZWVuIC0xIGFuZCAxIChpbmNsdXNpdmVseSkuCgpGdW5jdGlvbiBtYXkgYmUgdXNlZCBmb3IgYXNzZXJ0OiB3aXRoaW5fYm91bmRzKCkKCgoK</div>
 
 
 

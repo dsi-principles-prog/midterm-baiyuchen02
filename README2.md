@@ -1,6 +1,6 @@
 ## Motivating problem
 
-The goal is to understand what factors contribute most to employee turnover. Therefore, the predictive modeling problem is to predict if a certain employee will leave the company or not.
+The motivating predictive modeling problem is to predict if a certain employee will leave the company or not based on a list of features on the employee.
 
 ## Data source
 
