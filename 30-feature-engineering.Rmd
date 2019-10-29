@@ -80,7 +80,7 @@ The test above shows that both the new standardized job statisfaction level rela
 
 Below I test whether the overwork only includes True and False.
 
-```{r}
+```{r, test_logical}
 hr_analytics %>% 
   check_overwork(monthly_hours) %>% 
   assert(in_set(c(TRUE, FALSE)), overwork)
