@@ -49,6 +49,15 @@ New feature: avg_num_proj_per_year
 Column used: number_project, time_spend_company
 
 
+```{r}
+average_number_project_per_year <- function(df){
+  df %>%
+    mutate(avg_num_proj_per_year = number_project / time_spend_company) %>%
+    select(avg_num_proj_per_year, everything())
+}
+```
+
+
 ## New feature 4: Difference between job satisfaction level and score of last evaluation:
 
 I think the difference between job satisfaction level and score of last evaluation is meaningful. Define the difference to be job satisfaction level minus score of last evaluation (satisfaction_level - last_evaluation). This diffenrence measures the cognitive difference between the employee's own satisfaction on the company's job and company's job evaluation on the employee.
@@ -93,6 +102,12 @@ The test above shows that overwork only includes True and False.
 Property: Average number of project participated per year should be between 0 and 7 (maximum of number_project) inclusively. 
 
 Function may be used for assert: within_bounds()
+
+```{r}
+hr_analytics %>%
+  average_number_project_per_year() %>%
+  assert(within_bounds(0,7), "avg_num_proj_per_year")
+```
 
 
 ## Test new feature 4
